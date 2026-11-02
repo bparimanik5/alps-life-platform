@@ -1,0 +1,8 @@
+import {cancelPolicy,createTrustDeed,Policy,switchPolicy,updateBeneficiaries} from '../src/domain/policy/policy';
+const policy:Policy={id:'POL-1',policyNumber:'ALPS-1',customerName:'A Customer',customerEmail:'a@example.test',product:'standard',sumAssuredPence:1000000,premiumPaidPence:4500,startDate:'2026-10-20',beneficiaries:[{name:'B',email:'b@example.test',sharePercent:100}],inTrust:false,cancelled:false};
+describe('policy servicing rules',()=>{
+ test('regression: beneficiary shares above or below 100 are blocked',()=>{expect(()=>updateBeneficiaries(policy,[{name:'B1',email:'b1@example.test',sharePercent:60},{name:'B2',email:'b2@example.test',sharePercent:50}])).toThrow('exactly 100%');expect(()=>updateBeneficiaries(policy,[{name:'B',email:'b@example.test',sharePercent:99}])).toThrow('exactly 100%')});
+ test('updates valid beneficiaries and creates trust deed',()=>{const changed=updateBeneficiaries(policy,[{name:'B1',email:'b1@example.test',sharePercent:60},{name:'B2',email:'b2@example.test',sharePercent:40}]);const trusted=createTrustDeed(changed);expect(trusted.inTrust).toBe(true);expect(trusted.trustDeed).toContain('ALPS-1');expect(trusted.trustDeed).toContain('B1 (60%)')});
+ test('full refund through day 30 and no refund afterward',()=>{expect(cancelPolicy(policy,new Date('2026-11-19T12:00:00Z')).refundPence).toBe(4500);expect(cancelPolicy(policy,new Date('2026-11-20T12:00:00Z')).refundPence).toBe(0)});
+ test('switch applies the cooling-off refund rule',()=>{expect(switchPolicy(policy,'over50',new Date('2026-10-25T12:00:00Z')).refundPence).toBe(4500);expect(switchPolicy(policy,'over50',new Date('2026-11-25T12:00:00Z')).refundPence).toBe(0)});
+});
