@@ -6,9 +6,11 @@ Single-process Node.js + TypeScript demo. Express routes validate HTTP input and
 flowchart TD
   Browser[Static UI: public/] --> API[Express REST API]
   API --> Quote[Quote domain]
+  API --> NewBusiness[New Business application domain]
   API --> Claims[Claims domain]
   API --> Policy[Policy servicing domain]
   Quote --> QuoteRepo[(Quote repository interface)]
+  NewBusiness --> ApplicationRepo[(Application repository interface)]
   Claims --> ClaimRepo[(Claim repository interface)]
   Policy --> PolicyRepo[(Policy repository interface)]
   Claims --> Email[EmailService]

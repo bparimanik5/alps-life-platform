@@ -12,6 +12,14 @@ All money is represented as integer pence in domain code and API responses. HTTP
 - Level premium uses original whole-pound cover. Decreasing term uses 82% of that rate. Integer arithmetic and half-up rounding are applied once to each final premium; no intermediate updates exist, so changing cover cannot accumulate rounding drift.
 - Quote emails contain premiums and a resume link and are recorded only in the local outbox.
 
+## New Business
+
+- A New Business application can start only from a priced quote and retains its quote ID, cover amount and level-term premium.
+- Applicants must be aged 18-75 inclusive. Cover is GBP 1-GBP 500,000 and term is 5-40 years, ending no later than age 85.
+- Payment method, material-facts confirmation, privacy consent and terms acceptance are mandatory before submission.
+- Non-UK residency, sanctions matches and politically exposed person flags route the application to referral.
+- Only `READY_TO_SUBMIT` applications can become `SUBMITTED`; draft, referred and already-submitted applications are rejected.
+
 ## Claims
 
 - Claims created from a known policy start as `PENDING`; handler assignment rotates A. Patel, J. Wilson, M. Chen.
