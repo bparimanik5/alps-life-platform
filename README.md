@@ -1,6 +1,6 @@
 # ALPS - Aviva Life Platform (mock)
 
-A self-contained Node.js + TypeScript demo for life cover quotes, claims and policy servicing. It uses Express 4, strict TypeScript, Zod validation, in-memory repository interfaces, a local email outbox, and a plain HTML/JavaScript UI. No real insurer, email, payment, or underwriting integrations are called. All customers are fictional.
+A self-contained Node.js + TypeScript demo for life cover quotes, New Business applications, claims and policy servicing. It uses Express 4, strict TypeScript, Zod validation, in-memory repository interfaces, a local email outbox, and a plain HTML/JavaScript UI. No real insurer, email, payment, or underwriting integrations are called. All customers are fictional.
 
 ## Requirements and run
 
@@ -20,6 +20,9 @@ JSON requests and responses unless uploading raw bytes. Quote cover is whole pou
 | GET | `/api/quotes/:id` | Read quote |
 | PATCH | `/api/quotes/:id/smoker` | Answer smoker question and price eligible quote |
 | POST | `/api/quotes/:id/email` | Queue quote summary and resume link; accepts optional `{ "email": "..." }` |
+| POST | `/api/new-business/applications` | Start a quote-linked application and evaluate completion/referral rules |
+| GET | `/api/new-business/applications/:id` | Read application, outstanding requirements and referral reasons |
+| POST | `/api/new-business/applications/:id/submit` | Submit a complete `READY_TO_SUBMIT` application exactly once |
 | POST | `/api/claims` | Create claim for seeded policy; optional `policyYearsInForce` |
 | POST | `/api/claims/:id/documents` | Upload raw PDF/JPEG/PNG bytes with `?type=...&filename=...`; validated metadata JSON is also supported |
 | GET | `/api/claims/:id` | Read claim/status/handler |
@@ -44,7 +47,7 @@ Example quote:
 }
 ```
 
-See [docs/business-rules.md](docs/business-rules.md) for numeric rules, [docs/architecture.md](docs/architecture.md) for components, and [docs/test-strategy.md](docs/test-strategy.md) for validation.
+See [docs/business-rules.md](docs/business-rules.md) for numeric rules, [docs/new-business-requirements.md](docs/new-business-requirements.md) for the New Business stories and sample data, [docs/architecture.md](docs/architecture.md) for components, and [docs/test-strategy.md](docs/test-strategy.md) for validation.
 
 ## Jira traceability (mock project SCRUM, label ALPS)
 
@@ -56,6 +59,7 @@ See [docs/business-rules.md](docs/business-rules.md) for numeric rules, [docs/ar
 | Over-50 ages 50-80 and GBP 25,000 cap; bug: "Over-50 quote accepts applicant age 49" | quote eligibility | age-49/cap regression tests |
 | Stable base, integer pence, half-up rounding; bug: "Premium rounding drifts" | integer quote pricing | repeat-cover determinism regression test |
 | Email quote summary and resume link | `EmailService`; `/api/quotes/:id/email` | API outbox test |
+| New Business - quote snapshot, applicant eligibility, term, completion controls, referrals and one-time submission | `src/domain/new-business/application.ts`; `/api/new-business/applications` | New Business domain tests |
 | Epic 2 - ALPS: Claims for life and protection - create from death notification, round-robin handler | `src/domain/claims/claims.ts` | claims domain tests |
 | Upload death certificate and claimant ID; bug: "Claim status stays Pending after document upload" | `/api/claims/:id/documents`; transition after both docs | required docs lifecycle regression test |
 | Payout sum assured plus compounded/capped indexation | claims payout | compound/cap test |
